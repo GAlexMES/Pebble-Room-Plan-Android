@@ -3,7 +3,9 @@ package de.brennecke.timetableroomplan;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
@@ -16,98 +18,79 @@ import com.getpebble.android.kit.util.PebbleDictionary;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
+
+import de.brennecke.timetableroomplan.model.Exchange;
+import de.brennecke.timetableroomplan.model.TTBL;
 
 public class MainActivity extends Activity {
 
-    Button showOnClock;
-    private Handler mHandler = new Handler();
+    private static final int REQUEST_PATH = 1;
+    String curFileName, curFilePath;
+    EditText edittext;
+    Button showOnClock, loadFileButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        addListenerOnButton();
+        //addListenerOnButton();
+        edittext = (EditText)findViewById(R.id.editText);
+        loadFileButton = (Button)findViewById(R.id.loadFileButton);
+        loadFileButton.setEnabled(false);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
         boolean isConnected = PebbleKit.isWatchConnected(this);
         Toast.makeText(this, "Pebble " + (isConnected ? "is" : "is not") + " connected!", Toast.LENGTH_LONG).show();
 
-        if(isConnected){
-           // pushNotificationToPebble();
+    }
+
+    public void getfile(View view){
+        loadFileButton.setEnabled(false);
+        Intent intent1 = new Intent(this, FileChooser.class);
+        startActivityForResult(intent1, REQUEST_PATH);
+    }
+
+    public void loadFile(View view){
+        try {
+            TTBLParser ttblParser = new TTBLParser(curFilePath , curFileName, getApplicationContext());
+            TTBL ttbl = ttblParser.getTTBL();
+            Exchange.getInstance().setTTBL(ttbl);
+            Exchange.getInstance().startService(getApplicationContext());
         }
-    }
+        catch(IOException ioe){
+            Toast.makeText(this, "Could not found the file!", Toast.LENGTH_LONG).show();
+        }
+        catch (XmlPullParserException xppe){
+            xppe.printStackTrace();
+        }
+        }
 
-
-    private void pushNotificationToPebble(){
-        // Push a notification
-        final Intent i = new Intent("com.getpebble.action.SEND_NOTIFICATION");
-
-        final Map data = new HashMap();
-        data.put("title", "Test Message");
-        data.put("body", "Whoever said nothing was impossible never tried to slam a revolving door.");
-        final JSONObject jsonData = new JSONObject(data);
-        final String notificationData = new JSONArray().put(jsonData).toString();
-
-        i.putExtra("messageType", "PEBBLE_ALERT");
-        i.putExtra("sender", "PebbleKit Android");
-        i.putExtra("notificationData", notificationData);
-        sendBroadcast(i);
-    }
-    public void addListenerOnButton() {
-
-        showOnClock = (Button) findViewById(R.id.showOnClockButton);
-
-        showOnClock.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-
-
-                Context context = getApplicationContext();
-
-                boolean isConnected = PebbleKit.isWatchConnected(context);
-                String uuidAsString = "3341d598-258e-4b71-b5a9-1c3348bf383e";
-                UUID appUUID =  UUID.fromString(uuidAsString);
-                if(isConnected) {
-                    //PebbleKit.startAppOnPebble(context, appUUID);
-
-                    Toast.makeText(context, "Launching...", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(context, "Watch is not connected!", Toast.LENGTH_LONG).show();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        // See which child activity is calling us back.
+        if (requestCode == REQUEST_PATH){
+            if (resultCode == RESULT_OK) {
+                curFilePath = data.getStringExtra("GetPath");
+                curFileName = data.getStringExtra("GetFileName");
+                edittext.setText(curFileName);
+                String splittedFileName[] = curFileName.split(Pattern.quote("."));
+                if(splittedFileName[splittedFileName.length-1].equals("ttbl")){
+                    loadFileButton.setEnabled(true);
                 }
-
-                mHandler.postDelayed(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        String currentRoom = ((EditText)findViewById(R.id.currentRoom)).getText().toString();
-                        String nextRoom = ((EditText)findViewById(R.id.nextRoom)).getText().toString();
-                        String uuidAsString = "3341d598-258e-4b71-b5a9-1c3348bf383e";
-                        UUID appUUID =  UUID.fromString(uuidAsString);
-                        PebbleDictionary outgoing = new PebbleDictionary();
-                        outgoing.addString(0, currentRoom);
-                        outgoing.addString(1, nextRoom);
-
-                        PebbleKit.sendDataToPebble(getApplicationContext(), appUUID, outgoing);
-
-                        Context context = getApplicationContext();
-                        Toast.makeText(context, "Message sent!", Toast.LENGTH_LONG).show();
-                    }
-
-                }, 5000L);
-
-
+                else{
+                    Toast.makeText(this, "Please select a valid .tbbl file!", Toast.LENGTH_LONG).show();
+                }
             }
-
-        });
-
+        }
     }
 }
