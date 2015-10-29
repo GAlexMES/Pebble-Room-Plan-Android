@@ -28,7 +28,7 @@ public class TTBLParser {
 
     public TTBLParser(String filePath, String fileName, Context context) throws IOException {
         this.filePath = filePath;
-        try {
+            try {
             File file = new File(filePath, fileName);
             in = new FileInputStream(file);
         } catch (IOException ioe) {

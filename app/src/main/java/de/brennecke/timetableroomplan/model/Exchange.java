@@ -1,7 +1,8 @@
 package de.brennecke.timetableroomplan.model;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -12,8 +13,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
-
-import de.brennecke.timetableroomplan.UpdateClockService;
 
 /**
  * Created by Alexander on 26.10.2015.
@@ -26,6 +25,8 @@ public class Exchange {
 
     private long waitTime = 5000;
     private TTBL ttbl;
+    private  PendingIntent pendingIntent;
+
 
     public static Exchange getInstance(){
         if(instance == null){
@@ -101,7 +102,7 @@ public class Exchange {
         }
 
         long waitTimeInMilliseconds = waitTimeInMinutes * 60 * 1000;
-        Log.i("nextUpdate", "Next update of clock will be in  " + waitTimeInMilliseconds+" milliseconds");
+        Log.i("nextUpdate", "Next update of clock will be in  " + waitTimeInMilliseconds + " milliseconds");
         waitTime = waitTimeInMilliseconds;
     }
 
@@ -146,9 +147,12 @@ public class Exchange {
         }
     }
 
-    public void startService(Context context){
-        Intent serviceIntent = new Intent(context, UpdateClockService.class);
-        serviceIntent.putExtra("TIME_TO_WAIT",waitTime);
-        context.startService(serviceIntent);
+    public void startAlarm(Context context){
+        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), waitTime, pendingIntent);
+    }
+
+    public void setPendingIntent(PendingIntent pendingIntent){
+        this.pendingIntent = pendingIntent;
     }
 }

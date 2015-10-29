@@ -29,10 +29,6 @@
             <category android:name="android.intent.category.DEFAULT" />
         </activity>
 
-        <service
-            android:name="UpdateClockService"
-            android:enabled="true"/>
-
     </application>
 
 </manifest>
