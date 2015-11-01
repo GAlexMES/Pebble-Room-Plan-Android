@@ -11,7 +11,6 @@ import java.util.Map;
 public class TTBL {
     List<Lesson> lessonList;
 
-    Map<Integer,Map<Integer,Map<Integer,String>>> sortedLocationList;
     Map<Integer, Integer> times;
     public final int LESSON_LENGTH = 90;
 
@@ -24,33 +23,20 @@ public class TTBL {
         times.put(2,710);
         times.put(3,820);
         times.put(4,930);
-
-        initSortedList();
     }
 
-    private void initSortedList(){
-        sortedLocationList = new HashMap<>();
-        for(int i = 0; i<2;i++){
-            sortedLocationList.put(i,new HashMap<Integer, Map<Integer, String>>());
-            for(int d = 2; d<7;d++) {
-                sortedLocationList.get(i).put(d,new HashMap<Integer, String>());
-            }
-        }
-    }
 
     public void addLeson(Lesson lesson){
         lessonList.add(lesson);
-        int weekmode = lesson.getWeekmode();
-        int dayOfWeek = lesson.getDayOfWeek();
-        int lessonOfDay = lesson.getLesson();
-        String location = lesson.getLocation();
-
-        sortedLocationList.get(weekmode).get(dayOfWeek).put(lessonOfDay,location);
     }
 
     public void addLessons(List<Lesson> lessonList){
         for(Lesson l : lessonList){
             addLeson(l);
         }
+    }
+
+    public List<Lesson> getLessonList(){
+        return lessonList;
     }
 }

@@ -60,6 +60,8 @@ public class MainActivity extends Activity {
         try {
             TTBLParser ttblParser = new TTBLParser(curFilePath , curFileName, getApplicationContext());
             TTBL ttbl = ttblParser.getTTBL();
+            SQLiteSourceAdapter sqLiteSourceAdapter = new SQLiteSourceAdapter(MainActivity.this);
+            sqLiteSourceAdapter.addTTBL(ttbl);
             Exchange.getInstance().setTTBL(ttbl);
             Exchange.getInstance().setPendingIntent(pendingIntent);
             Exchange.getInstance().startAlarm(getApplicationContext());
