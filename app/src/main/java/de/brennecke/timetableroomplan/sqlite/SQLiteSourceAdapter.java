@@ -1,4 +1,4 @@
-package de.brennecke.timetableroomplan;
+package de.brennecke.timetableroomplan.sqlite;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -36,6 +36,7 @@ public class SQLiteSourceAdapter {
     }
 
     public void addTTBL(TTBL ttbl){
+        database.delete(SQLiteHelper.TABLE_TTBL, null, null);
         List<Lesson> lessonList = ttbl.getLessonList();
         for(Lesson l : lessonList) {
             ContentValues values = new ContentValues();
@@ -49,23 +50,43 @@ public class SQLiteSourceAdapter {
         }
     }
 
-    public Lesson getNextLesson() {
+    public Lesson getLesson(Date date) {
+        Cursor cursor;
+        cursor = getCursorForCurrentTime(date);
+
+        if(cursor.getCount()<1){
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            cal.add(Calendar.HOUR_OF_DAY, 1);
+            cal.add(Calendar.MINUTE, 90);
+            cursor = getCursorForCurrentTime(cal.getTime());
+        }
+
+        if(cursor.getCount()>0) {
+            cursor.moveToFirst();
+            Lesson newLesson = cursorToLesson(cursor);
+            cursor.close();
+            return newLesson;
+        }
+        return null;
+    }
+
+    private Cursor getCursorForCurrentTime(Date date){
         Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
+        cal.setTime(date);
         int weekmode = cal.get(Calendar.WEEK_OF_YEAR)%2;
         int day = cal.get(Calendar.DAY_OF_WEEK);
+        int time = cal.get(Calendar.HOUR_OF_DAY)*60+cal.get(Calendar.MINUTE);
 
+        String condition =  SQLiteHelper.COLUMN_WEEKMODE +"="+weekmode+
+                " AND " + SQLiteHelper.COLUMN_DAY+"="+day +
+                " AND " + SQLiteHelper.COLUMN_START+"<"+time +
+                " AND " + SQLiteHelper.COLUMN_END+">"+time;
 
-        String condition =  SQLiteHelper.COLUMN_WEEKMODE +"="+weekmode+" AND "
-                            + SQLiteHelper.COLUMN_DAY+"="+day;
         Cursor cursor = database.query(SQLiteHelper.TABLE_TTBL,
                 allColumns, condition, null,
                 null, null, null);
-
-        cursor.moveToFirst();
-        Lesson newLesson = cursorToLesson(cursor);
-        cursor.close();
-        return newLesson;
+        return cursor;
     }
 
     private Lesson cursorToLesson(Cursor cursor) {

@@ -1,4 +1,4 @@
-package de.brennecke.timetableroomplan;
+package de.brennecke.timetableroomplan.sqlite;
 
 /**
  * Created by Alexander on 28.10.2015.
@@ -33,7 +33,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_ROOM+ " text, "
             + COLUMN_START + " integer, "
             + COLUMN_END + " integer, "
-            + COLUMN_WEEKMODE + " integer, "
+            + COLUMN_WEEKMODE + " integer "
             + ");";
 
     public SQLiteHelper(Context context) {

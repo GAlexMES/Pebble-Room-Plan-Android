@@ -16,8 +16,9 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import de.brennecke.timetableroomplan.model.Exchange;
+import de.brennecke.timetableroomplan.filebrowser.FileChooser;
 import de.brennecke.timetableroomplan.model.TTBL;
+import de.brennecke.timetableroomplan.sqlite.SQLiteSourceAdapter;
 
 public class MainActivity extends Activity {
 
@@ -61,10 +62,10 @@ public class MainActivity extends Activity {
             TTBLParser ttblParser = new TTBLParser(curFilePath , curFileName, getApplicationContext());
             TTBL ttbl = ttblParser.getTTBL();
             SQLiteSourceAdapter sqLiteSourceAdapter = new SQLiteSourceAdapter(MainActivity.this);
+            sqLiteSourceAdapter.open();
             sqLiteSourceAdapter.addTTBL(ttbl);
-            Exchange.getInstance().setTTBL(ttbl);
-            Exchange.getInstance().setPendingIntent(pendingIntent);
-            Exchange.getInstance().startAlarm(getApplicationContext());
+            sqLiteSourceAdapter.close();
+            UpdateClock.setTimer(getApplicationContext());
         }
         catch(IOException ioe){
             Toast.makeText(this, "Could not found the file!", Toast.LENGTH_LONG).show();

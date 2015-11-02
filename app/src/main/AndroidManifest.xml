@@ -21,13 +21,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".FileChooser"
+            android:name=".filebrowser.FileChooser"
             android:label="Choose File"
             android:theme="@android:style/Theme.Holo">
             <action android:name="com.example.fileexplorer.FileChooser" />
 
             <category android:name="android.intent.category.DEFAULT" />
         </activity>
+
+        <receiver android:name=".UpdateReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
 
     </application>
 

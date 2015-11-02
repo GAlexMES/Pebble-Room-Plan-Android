@@ -1,4 +1,4 @@
-package de.brennecke.timetableroomplan;
+package de.brennecke.timetableroomplan.filebrowser;
 
 public class Item implements Comparable<Item>{
     private String name;

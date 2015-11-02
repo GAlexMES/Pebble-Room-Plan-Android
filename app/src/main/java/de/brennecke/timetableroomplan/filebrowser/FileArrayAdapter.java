@@ -1,6 +1,5 @@
-package de.brennecke.timetableroomplan;
+package de.brennecke.timetableroomplan.filebrowser;
 
-import java.util.List;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -9,6 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.util.List;
+
+import de.brennecke.timetableroomplan.R;
 
 public class FileArrayAdapter extends ArrayAdapter<Item>{
 
@@ -27,6 +30,7 @@ public class FileArrayAdapter extends ArrayAdapter<Item>{
     {
         return items.get(i);
     }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;

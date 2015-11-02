@@ -1,4 +1,4 @@
-package de.brennecke.timetableroomplan;
+package de.brennecke.timetableroomplan.filebrowser;
 
 import java.io.File;
 import java.sql.Date;
@@ -14,6 +14,8 @@ import android.content.Intent;
 import android.os.Environment;
 import android.view.View;
 import android.widget.ListView;
+
+import de.brennecke.timetableroomplan.R;
 
 public class FileChooser extends ListActivity {
 
@@ -70,7 +72,7 @@ public class FileChooser extends ListActivity {
         dir.addAll(fls);
         if(!f.getName().equalsIgnoreCase("sdcard"))
             dir.add(0,new Item("..","Parent Directory","",f.getParent(),"directory_up"));
-        adapter = new FileArrayAdapter(FileChooser.this,R.layout.filebrowser,dir);
+        adapter = new FileArrayAdapter(FileChooser.this, R.layout.filebrowser,dir);
         this.setListAdapter(adapter);
     }
     @Override
