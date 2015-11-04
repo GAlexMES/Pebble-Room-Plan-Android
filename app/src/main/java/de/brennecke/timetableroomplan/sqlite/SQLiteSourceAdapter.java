@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -54,14 +55,6 @@ public class SQLiteSourceAdapter {
         Cursor cursor;
         cursor = getCursorForCurrentTime(date);
 
-        if(cursor.getCount()<1){
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(date);
-            cal.add(Calendar.HOUR_OF_DAY, 1);
-            cal.add(Calendar.MINUTE, 90);
-            cursor = getCursorForCurrentTime(cal.getTime());
-        }
-
         if(cursor.getCount()>0) {
             cursor.moveToFirst();
             Lesson newLesson = cursorToLesson(cursor);
@@ -87,6 +80,36 @@ public class SQLiteSourceAdapter {
                 allColumns, condition, null,
                 null, null, null);
         return cursor;
+    }
+
+    public List<Lesson> getNextLessonsOfDay(Date date) {
+
+        List<Lesson> retval = new ArrayList<>();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int weekmode = cal.get(Calendar.WEEK_OF_YEAR) % 2;
+        int day = cal.get(Calendar.DAY_OF_WEEK);
+        int time = cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE);
+
+        String condition = SQLiteHelper.COLUMN_WEEKMODE + "=" + weekmode +
+                " AND " + SQLiteHelper.COLUMN_DAY + "=" + day +
+                " AND " + SQLiteHelper.COLUMN_START + ">=" + time;
+
+        Cursor cursor = database.query(SQLiteHelper.TABLE_TTBL,
+                allColumns, condition, null,
+                null, null, null);
+
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            while (!cursor.isAfterLast()) {
+                Lesson album = cursorToLesson(cursor);
+                retval.add(album);
+                cursor.moveToNext();
+            }
+            return retval;
+        }
+    return null;
     }
 
     private Lesson cursorToLesson(Cursor cursor) {

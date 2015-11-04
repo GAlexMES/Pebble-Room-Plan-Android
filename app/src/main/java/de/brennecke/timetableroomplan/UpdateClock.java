@@ -6,28 +6,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by Alexander on 02.11.2015.
  */
 public class UpdateClock {
 
-    public static void setTimer(Context context){
-
+    public static void setTimer(Context context, List<Integer> timeList) {
+        int interval = 24 * 60 * 60 * 1000;
         Intent alarmIntent = new Intent(context, UpdateReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        int interval = 20*60*1000;
 
-        /* Set the alarm to start at 10:30 AM */
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 21);
-        calendar.set(Calendar.MINUTE, 57);
+        timeList.add(7 * 60 + 30);
 
-        manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, interval, interval, pendingIntent);
-        Log.i("alarm", "created alarm");
+        for (Integer i : timeList) {
+            manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, interval, interval, pendingIntent);
+            Log.i("alarm", "created alarm for"+i);
+        }
     }
 
 }

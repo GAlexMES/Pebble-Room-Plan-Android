@@ -65,7 +65,7 @@ public class MainActivity extends Activity {
             sqLiteSourceAdapter.open();
             sqLiteSourceAdapter.addTTBL(ttbl);
             sqLiteSourceAdapter.close();
-            UpdateClock.setTimer(getApplicationContext());
+            UpdateClock.setTimer(getApplicationContext(), ttbl.getTimeList());
         }
         catch(IOException ioe){
             Toast.makeText(this, "Could not found the file!", Toast.LENGTH_LONG).show();

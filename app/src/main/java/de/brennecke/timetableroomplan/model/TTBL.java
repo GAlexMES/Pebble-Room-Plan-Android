@@ -1,39 +1,38 @@
 package de.brennecke.timetableroomplan.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Alexander on 26.10.2015.
  */
 public class TTBL {
     List<Lesson> lessonList;
+    List<Integer> timesList;
 
-    Map<Integer, Integer> times;
     public final int LESSON_LENGTH = 90;
 
     public TTBL(){
         lessonList = new ArrayList<>();
-
-        times = new HashMap<>();
-        times.put(0,490);
-        times.put(1,600);
-        times.put(2,710);
-        times.put(3,820);
-        times.put(4,930);
+        timesList = new ArrayList<>();
     }
 
 
     public void addLeson(Lesson lesson){
         lessonList.add(lesson);
+        if(!timesList.contains(lesson.getStart())){
+            timesList.add(lesson.getStart());
+        }
     }
 
     public void addLessons(List<Lesson> lessonList){
         for(Lesson l : lessonList){
             addLeson(l);
         }
+    }
+
+    public List<Integer> getTimeList(){
+        return timesList;
     }
 
     public List<Lesson> getLessonList(){
