@@ -16,15 +16,17 @@ public class UpdateClock {
     public static void setTimer(Context context, List<Integer> timeList) {
         int interval = 24 * 60 * 60 * 1000;
         Intent alarmIntent = new Intent(context, UpdateReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        timeList.add(7 * 60 + 30);
-
         for (Integer i : timeList) {
+            final int _id = (int) System.currentTimeMillis();
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, _id, alarmIntent,PendingIntent.FLAG_ONE_SHOT);
             manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, interval, interval, pendingIntent);
-            Log.i("alarm", "created alarm for"+i);
+            Log.i("alarm", "created alarm for: "+i);
         }
+
+        long nextTriggerTime = manager.getNextAlarmClock().getTriggerTime();
+        Log.i("alarm", "next alarm will be at: "+nextTriggerTime);
     }
 
 }

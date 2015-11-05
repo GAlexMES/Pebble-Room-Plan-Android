@@ -15,6 +15,7 @@ public class TTBL {
     public TTBL(){
         lessonList = new ArrayList<>();
         timesList = new ArrayList<>();
+        timesList.add(7 * 60 + 30);
     }
 
 
